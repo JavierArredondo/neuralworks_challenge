@@ -1,21 +1,22 @@
-from confluent_kafka import admin, Producer
-import pandas as pd
-import os
 import json
 import logging
+import os
 import uuid
 
-KAFKA_CONFIG = {
-    "bootstrap.servers": os.getenv("KAFKA_SERVER", "localhost:9092")
-}
+import pandas as pd
+from confluent_kafka import Producer, admin
 
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s %(levelname)s %(name)s: %(message)s',
-                    datefmt='%Y-%m-%d %H:%M:%S')
+KAFKA_CONFIG = {"bootstrap.servers": os.getenv("KAFKA_SERVER", "localhost:9092")}
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
 
 
 if __name__ == "__main__":
-    num_messages = os.getenv("NUM_MESSAGES", 10000)
+    num_messages = int(os.getenv("NUM_MESSAGES", 10000))
     topic = os.getenv("TOPIC_NAME", "trips")
     data_path = os.getenv("DATA_PATH", "../trips.csv")
 

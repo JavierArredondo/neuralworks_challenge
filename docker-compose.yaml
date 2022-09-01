@@ -59,6 +59,7 @@ services:
     environment:
       - KAFKA_SERVER=kafka:9093
       - DATA_PATH=trips.csv
+      - NUM_MESSAGES=100000
     volumes:
       - ./trips.csv:/app/trips.csv
 
