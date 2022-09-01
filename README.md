@@ -58,7 +58,7 @@ El flujo contemplado es:
 
 ![data_flow](docs/data_flow.png)
 
-## Otros
+### Otros
 
 El proyecto cuenta con pre-commit para:
 - Respetar standard PEP8
