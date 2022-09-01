@@ -65,3 +65,10 @@ El proyecto cuenta con pre-commit para:
 - Ordenar imports.
 - Ordenar requirements.txt
 - Arreglar archivos .yaml
+
+
+Para llevar a cabo esta solución a la nube (AWS, GCP, etc) es bastante sencillo, dado que ya se tienen las imagenes para cada aplicación.
+En el caso de utilizar AWS por ejemplo, se pueden usar algunos servicios como:
+- MSK para administrar Kafka
+- RDS para administrar PSQL
+- EKS como orquestador de contenedores (producer, consumer, api y AKHQ)
