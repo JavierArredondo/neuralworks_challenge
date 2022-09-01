@@ -29,7 +29,8 @@ El resultado del consumidor es una tabla con las siguientes columnas:
 - Informar sobre el estado de la ingesta de datos.
 
 Para esto se ha facilitado una API escrita en Flask-restx, donde se tienen dos endpoints:
-- Método GET en `/trip/bounding_box` donde recibe las coordenadas de búsqueda para buscar el promedio de viajes semanales por región.
+- Método GET en `/trip/bounding_box` donde recibe las coordenadas de búsqueda para buscar el promedio de viajes semanales por región. Este endpoint recibe el nombre de la región y dos puntos de referencia, de tal forma se crea un bounding box, como muestra la siguiente imagen:
+![bbox](docs/boundingbox.png)
 - Método GET en `/ingesiton/status` para ver el estado de la ingesta de datos.
 
 Se puede consultar directamente en el Swagger de la aplicación (http://localhost:5000/)
