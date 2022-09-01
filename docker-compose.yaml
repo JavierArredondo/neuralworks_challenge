@@ -77,3 +77,34 @@ services:
       - SCALER_PATH=models/scaler.pkl
     volumes:
       - ./models:/app/models
+
+  akhq:
+    image: tchiotludo/akhq
+    environment:
+      AKHQ_CONFIGURATION: |
+        akhq:
+          connections:
+            docker-kafka-server:
+              properties:
+                bootstrap.servers: "kafka:9093"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - kafka
+      - zookeeper
+      - initdb
+
+  api:
+    build: ./api
+    environment:
+      - APP_WORKERS=3
+      - APP_THREADS=1
+      - TIMEOUT_REQUEST=120
+      - LOG_LEVEL=info
+      - AKHQ_URL=akhq:8080
+      - DB_USER=an_user
+      - DB_PASSWORD=a_password
+      - DB_NAME=neuralworks
+      - DB_HOST=postgis
+    ports:
+      - "5000:5000"

@@ -1,22 +1,24 @@
-import pandas as pd
-import geopandas as gpd
-from sklearn.preprocessing import StandardScaler
-from confluent_kafka import Consumer
-import logging
-import pickle
 import json
+import logging
 import os
+import pickle
 
+import geopandas as gpd
+import pandas as pd
+from confluent_kafka import Consumer
+from sklearn.preprocessing import StandardScaler
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s %(levelname)s %(name)s: %(message)s',
-                    datefmt='%Y-%m-%d %H:%M:%S')
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
 
 KAFKA_CONFIG = {
     "bootstrap.servers": os.getenv("KAFKA_SERVER", "localhost:9092"),
-    'auto.offset.reset': 'earliest',
+    "auto.offset.reset": "earliest",
 }
 
 
@@ -29,14 +31,18 @@ def parse_input(df: pd.DataFrame) -> pd.DataFrame:
 
 def preprocess(df: pd.DataFrame, transformer: StandardScaler) -> pd.DataFrame:
     df = parse_input(df)
-    features = pd.DataFrame({
-        "num_hour": df["datetime"].apply(lambda x: int(x.strftime("%H"))),
-        "x_orig": df["origin_coord"].apply(lambda x: x.x),
-        "y_orig": df["origin_coord"].apply(lambda x: x.y),
-        "x_dest": df["destination_coord"].apply(lambda x: x.x),
-        "y_dest": df["destination_coord"].apply(lambda x: x.y),
-        "distance": df.apply(lambda x: x["origin_coord"].distance(x["destination_coord"]), axis=1),
-    })
+    features = pd.DataFrame(
+        {
+            "num_hour": df["datetime"].apply(lambda x: int(x.strftime("%H"))),
+            "x_orig": df["origin_coord"].apply(lambda x: x.x),
+            "y_orig": df["origin_coord"].apply(lambda x: x.y),
+            "x_dest": df["destination_coord"].apply(lambda x: x.x),
+            "y_dest": df["destination_coord"].apply(lambda x: x.y),
+            "distance": df.apply(
+                lambda x: x["origin_coord"].distance(x["destination_coord"]), axis=1
+            ),
+        }
+    )
     p = transformer.transform(features)
     return p
 
@@ -55,7 +61,9 @@ if __name__ == "__main__":
     database = os.getenv("DB", "neuralworks")
     host = os.getenv("HOST", "localhost")
     # Init database engine
-    engine = create_engine(f'postgresql://{username}:{password}@{host}:5432/{database}', echo=False)
+    engine = create_engine(
+        f"postgresql://{username}:{password}@{host}:5432/{database}", echo=False
+    )
     Session = sessionmaker(bind=engine)
     session = Session()
 
@@ -82,5 +90,6 @@ if __name__ == "__main__":
             logging.info("Doing inference")
             groups = model.predict(preprocessed)
             data["group"] = groups
-            data.to_sql('trips', engine, if_exists="append", index=False)
+            data.to_sql("trips", engine, if_exists="append", index=False)
             logging.info(f"Stored {len(msgs)} record")
+            consumer.commit()
